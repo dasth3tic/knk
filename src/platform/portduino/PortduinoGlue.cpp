@@ -1,3 +1,5 @@
+#ifdef ARCH_PORTDUINO
+
 #include "CryptoEngine.h"
 #include "PortduinoGPIO.h"
 #include "SPIChip.h"
@@ -418,3 +420,4 @@ static bool ends_with(std::string_view str, std::string_view suffix)
 {
     return str.size() >= suffix.size() && str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
 }
+#endif // ARCH_PORTDUINO
