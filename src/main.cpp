@@ -1222,6 +1222,7 @@ void loop()
     }
 }
 #endif
+#ifdef CONFIG_IDF_TARGET_ESP32C6
 // Define app_main to bridge Arduino and ESP-IDF
 extern "C" void app_main(void)
 {
@@ -1231,3 +1232,4 @@ extern "C" void app_main(void)
         vTaskDelay(1); // Allows FreeRTOS to manage tasks
     }
 }
+#endif
