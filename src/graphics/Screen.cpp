@@ -66,6 +66,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "platform/portduino/PortduinoGlue.h"
 #endif
 
+#if defined(M5STACK_CORE2)
+#include "M5Unified.h"
+#define OLED_BLACK OLEDDISPLAY_COLOR::BLACK
+#define OLED_WHITE OLEDDISPLAY_COLOR::WHITE
+#else
+#define OLED_BLACK BLACK
+#define OLED_WHITE WHITE
+#endif
+
 using namespace meshtastic; /** @todo remove */
 
 namespace graphics
@@ -1582,6 +1591,10 @@ void Screen::handleSetOn(bool on, FrameCallback einkScreensaver)
             digitalWrite(VTFT_LEDA, TFT_BACKLIGHT_ON);
 #endif
 #endif
+#if defined(M5STACK_CORE2)
+            M5.Power.Axp192.setDCDC3(1000);
+            M5.Display.setBrightness(130);
+#endif
             enabled = true;
             setInterval(0); // Draw ASAP
             runASAP = true;
@@ -1593,6 +1606,9 @@ void Screen::handleSetOn(bool on, FrameCallback einkScreensaver)
 #endif
             LOG_INFO("Turn off screen");
             dispdev->displayOff();
+#if defined(M5STACK_CORE2)
+            M5.Power.Axp192.setDCDC3(0);
+#endif
 #ifdef USE_ST7789
             SPI1.end();
 #if defined(ARCH_ESP32)

@@ -117,6 +117,10 @@ AudioThread *audioThread = nullptr;
 float tcxoVoltage = SX126X_DIO3_TCXO_VOLTAGE; // if TCXO is optional, put this here so it can be changed further down.
 #endif
 
+#if defined(M5STACK_CORE2)
+#include <M5Unified.h>
+#endif
+
 using namespace concurrency;
 
 volatile static const char slipstreamTZString[] = USERPREFS_TZ_STRING;
@@ -804,6 +808,10 @@ void setup()
         RECORD_CRITICALERROR(meshtastic_CriticalErrorCode_NO_AXP192); // Record a hardware fault for missing hardware
 #endif
 
+#if defined(M5STACK_CORE2)
+    M5.begin();
+#endif
+
 #if !MESHTASTIC_EXCLUDE_I2C
 // Don't call screen setup until after nodedb is setup (because we need
 // the current region name)
@@ -1220,5 +1228,8 @@ void loop()
     if (!runASAP && loopCanSleep()) {
         mainDelay.delay(delayMsec);
     }
+#if defined(M5STACK_CORE2)
+    ScreenTouch();
+#endif // M5STACK_CORE2
 }
 #endif
