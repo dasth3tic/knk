@@ -84,17 +84,30 @@ if platform.name == "nordicnrf52":
                       env.VerboseAction(f"{sys.executable} ./bin/uf2conv.py $BUILD_DIR/firmware.hex -c -f 0xADA52840 -o $BUILD_DIR/firmware.uf2",
                                         "Generating UF2 file"))
 
-Import("projenv")
+verPropFile = "version.properties"
 
-prefsLoc = projenv["PROJECT_DIR"] + "/version.properties"
+try:
+    # See: https://github.com/platformio/platform-espressif32/issues/953
+    Import("projenv")
+    prefsLoc = projenv["PROJECT_DIR"] + "/" + verPropFile
+except Exception as e:
+    print(f"Warning: Unable to import 'projenv'. Falling back. Error: {e}")
+    projenv = None
+    prefsLoc = "./" + verPropFile  # Fallback location
+
 verObj = readProps(prefsLoc)
-print("Using meshtastic platformio-custom.py, firmware version " + verObj["long"] + " on " + env.get("PIOENV"))
 
-# General options that are passed to the C and C++ compilers
-projenv.Append(
-    CCFLAGS=[
-        "-DAPP_VERSION=" + verObj["long"],
-        "-DAPP_VERSION_SHORT=" + verObj["short"],
-        "-DAPP_ENV=" + env.get("PIOENV"),
+appEnv = env.get("PIOENV")
+
+print(f"Using meshtastic platformio-custom.py, firmware version {verObj['long']} on {appEnv}")
+
+buildFlags = [
+    "-DAPP_VERSION=" + verObj["long"],
+    "-DAPP_VERSION_SHORT=" + verObj["short"],
+    "-DAPP_ENV=" + appEnv,
     ]
-)
+
+if projenv:
+    projenv.Append(CCFLAGS=buildFlags)
+
+env.Append(BUILD_FLAGS=buildFlags)
